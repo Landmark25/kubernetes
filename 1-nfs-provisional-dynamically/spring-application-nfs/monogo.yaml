@@ -1,0 +1,51 @@
+# claiming  hostpath pvc for mongo database
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mongodb-rs
+  labels:
+    app: mongodbs
+spec:
+  # modify replicas according to your case
+  selector:
+    matchLabels:
+      app: mongodbs
+  template:
+    metadata:
+      labels:
+        app: mongodbs
+    spec:
+      containers:
+      - name: mongodb-container
+        image: mongo
+        ports:
+        - containerPort:  27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+           secretKeyRef:
+            name: mongo-db-credentials
+            key:  mongo-username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+           secretKeyRef:
+            name: mongo-db-credentials
+            key: mongo-password
+        volumeMounts:
+        - name: nfs-volume1
+          mountPath: /data/db
+      volumes:
+        - name: nfs-volume1
+          persistentVolumeClaim:
+            claimName: nfs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  selector:
+    app: mongodbs
+  ports:
+  - port: 27017
+    targetPort: 27017

@@ -1,0 +1,82 @@
+
+Step 1: Make sure to have configured nfs-kernel-server 
+Configuration of NFS Server if not follow to the steps below to configure nfs server and client
+
+Step 2: Install NFS Kernel Server
+Before installing the NFS Kernel server, 
+  we need to update our system’s repository index with that of the Internet through the following apt command as sudo:
+
+sudo apt-get update
+
+The above command lets us install the latest available version of a software through the Ubuntu repositories.
+
+Now, run the following command in order to install the NFS Kernel Server on your system:
+
+sudo apt install nfs-kernel-server -y
+
+
+Step 3: Create the Export Directory
+
+sudo mkdir -p /mnt/share/
+
+=# As we want all clients to access the directory,
+    we will remove restrictive permissions.
+
+sudo chown nobody:nogroup /mnt/share/
+sudo chmod 777 /mnt/share/
+
+Step 4: Assign server access to client(s) through NFS export file
+
+sudo vi /etc/exports
+
+
+#/mnt/share/ <clientIP or Clients CIDR>(rw,sync,no_subtree_check,no_root_squash)
+ #Ex:
+ 
+/mnt/share/ *(rw,sync,no_subtree_check,no_root_squash)
+
+/mnt/share1/ *(rw,sync,no_subtree_check,no_root_squash)
+
+
+Step 5: Export the shared directory
+
+sudo exportfs -a
+
+sudo systemctl restart nfs-kernel-server
+
+
+step 6: To show all the mounts directory
+sudo showmounts -e
+
+Step 7: Open firewall for the client (s) PORT 2049
+
+
+
+
+Configuring the Client Machine
+
+
+Step 8: Install NFS Common
+Before installing the NFS Common application, we need to update our system’s repository index with that of the Internet through the following apt command as sudo:
+
+sudo apt-get update && sudo apt-get install nfs-common -y
+
+sudo apt-get install nfs-common
+
+ 
+
+Step 9: Make sure to have helm installed on your server  then run the command below;
+
+ helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+$ helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+    --set nfs.server=x.x.x.x \   # add nfs-server-private-ip
+    --set nfs.path=/exported/path # add mount-path
+
+or 
+
+use the values.yaml  and pass it as a flag to make the nfs-client the default storageclass
+ helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner -f values.yaml \
+    --set nfs.server=x.x.x.x \   # add nfs-server-private-ip
+    --set nfs.path=/exported/path # add mount-path
+
+
