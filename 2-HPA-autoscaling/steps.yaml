@@ -1,0 +1,68 @@
+# https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+
+Step 1:
+ # you need to have a meterics server on your laptop
+Install meteric server in your cluster.
+
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+
+helm install metrics metrics-server/metrics-server
+
+need to have resource limits set on pods
+
+# default configurations
+15secs - controller checks the pods utlilzaion 
+
+3mins -  scaling up/out --- it waits for 3mins for the next scaling out 
+
+5mins - scaling in --- it waits for 5mins for the next scaling in
+
+step2: deploy the application with resource limit
+
+kubectl run nginx --image nginx or create yaml file 
+
+kubectl expose pod/nginx --type NodePort --port 80 or create service fiel
+
+
+# HPA for CPU utilization
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx
+spec:
+  maxReplicas: 5
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  targetCPUUtilizationPercentage: 20
+
+# HPA for Memory Utilization
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx
+spec:
+  maxReplicas: 5
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageUtilization: 50
+
+
+step3: install seige to load requests to your application
+
+sudo apt-get install siege 
+
+# to load the pod use command below 
+seige -q -c <number of concurrent requests> -t <time> url 
+siege -q -c 5 -t 2m http://18.217.168.168:31500/
+
+
