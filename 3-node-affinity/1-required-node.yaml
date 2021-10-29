@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: landmark-node-affinity
+  labels:
+    name: myapp
+spec:
+  affinity:
+    nodeAffinity:
+     requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: app
+          operator: NotIn #In
+          values:
+          - dbserver
+  containers:
+  - name: affinity
+    image: nginx
+    resources:
+      limits:
+        memory: "200Mi"
+        cpu: "500m"
+      requests:
+       memory: "200Mi"
+       cpu: "100m"
+    ports:
+      - containerPort: 80
+
+

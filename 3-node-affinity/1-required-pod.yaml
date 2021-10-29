@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: landmark-pod-affinity
+  labels:
+    name: myapp
+spec:
+  affinity:
+    podAffinity:
+     requiredDuringSchedulingIgnoredDuringExecution:
+     - labelSelector:
+        matchExpressions:
+        - key: app
+          operator: NotIn #NotIn --> podantiAffinity or In --> podAffinity 
+          values:
+          - dbserver
+       topologyKey: kubernetes.io/hostname
+  containers:
+  - name: pod-affinity
+    image: nginx
+    resources:
+      limits:
+        memory: "200Mi"
+        cpu: "500m"
+      requests:
+       memory: "200Mi"
+       cpu: "100m"
+    ports:
+      - containerPort: 80
+
+

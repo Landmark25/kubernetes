@@ -1,0 +1,33 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livenes-probex
+spec:
+  selector:
+    matchLabels:
+      app: mynginx
+  template:
+    metadata:
+      labels:
+        app: mynginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx-container
+        ports:
+        - containerPort: 80
+        args:
+        - /bin/sh
+        - -c 
+        - touch /tmp/hello; sleep 30; rm -rf /tmp/hello; sleep 600
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/hello
+          initialDelaySeconds: 5
+          periodSeconds: 5 
+---
+
+

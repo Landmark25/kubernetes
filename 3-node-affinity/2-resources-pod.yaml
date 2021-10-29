@@ -1,0 +1,26 @@
+# Quality of Service
+# Best Effort =  No requests / no limits  = lowest priority and get terminated first when nodes runs out of resources 
+# Burstable = requests not equal to limits - next to be killed if no best effort pods remain
+# Guaranteed = request = limits - first priority#  
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: landmark-pod-affinity
+  labels:
+    name: myapp
+spec:
+  containers:
+  - name: pod-affinity
+    image: nginx
+    resources:
+      limits:
+        memory: "200Mi"
+        cpu: "500m"
+      requests:
+       memory: "200Mi"
+       cpu: "500m"
+    ports:
+      - containerPort: 80
+
+

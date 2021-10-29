@@ -1,0 +1,25 @@
+# kubectl taint nodes <kubeadm-worker-01> key=value:NoSchedule
+# kubectl taint nodes <kubeadm-worker-01> key=value:NoExecute
+# kubectl taint nodes <kubeadm-worker-01> key=value:PreferNoSchedule
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: landmark-pod-affinity
+  labels:
+    name: myapp
+spec:
+  containers:
+  - name: pod-affinity
+    image: nginx
+    resources:
+      limits:
+        memory: "200Mi"
+        cpu: "500m"
+      requests:
+       memory: "200Mi"
+       cpu: "500m"
+    ports:
+      - containerPort: 80
+
+

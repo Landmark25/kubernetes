@@ -1,0 +1,25 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livenes-probe-http
+spec:
+  selector:
+    matchLabels:
+      app: mynginx
+  template:
+    metadata:
+      labels:
+        app: mynginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx-container
+        ports:
+        - containerPort: 80
+        livenessProbe:
+         httpGet:
+              path: /app.html
+              port: 80 
+         initialDelaySeconds: 5
+         periodSeconds: 5
